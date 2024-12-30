@@ -91,3 +91,23 @@ export function findRoomById(req,res){
         }
     )
 }
+
+// Get All Rooms
+
+export function getRooms(req,res){
+
+    Room.find().then(
+        (result)=>{
+            res.json({
+                rooms : result
+            })
+        }
+    ).catch(
+        ()=>{
+            res.json({
+                message : "Failed to get rooms"
+                
+            })
+        }
+    )
+}
