@@ -13,7 +13,7 @@ categoryRouter.get("/:name",getCategoryByName)
 
 categoryRouter.get("/",getCategory)
 
-categoryRouter.patch("/:name", updateCategory);
+categoryRouter.put("/:name", updateCategory);
 
 export default categoryRouter;
 

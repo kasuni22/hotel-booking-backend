@@ -161,41 +161,38 @@ export function getCategoryByPrice(req, res) {
 // update Category
 
 export function updateCategory(req, res) {
-    if(req.user == null) {
-        res.status(401).json({
+
+    if(!isAdminValid(req)) {
+        res.status(403).json({
             message: "Unauthorized"
-        });
-        return;
+        })
+        return
     }
     
-    if(req.user.type != "admin") {
-        res.status(403).json({
-            message: "Forbidden"
-        });
-        return;
-    }
-
     const name = req.params.name;
-    const updates = req.body;
 
-    Category.findOneAndUpdate(
-        { name: name },
-        updates,
-        { new: true, runValidators: true }
-    ).then((updatedCategory) => {
-        if (!updatedCategory) {
-            return res.status(404).json({
-                message: "Category not found"
-            });
-        }
+    Category.updateOne({ name: name },req.body).then(
+        () => {
         res.json({
-            message: "Category updated successfully",
-            category: updatedCategory
-        });
-    }).catch((err) => {
-        res.status(500).json({
-            message: "Category update failed",
-            error: err
-        });
-    });
+            message: "Category updated successfully"
+        })
+    }).catch(
+        () => {
+        res.json({
+            message: "Failed to update category"
+            
+        })
+    }
+    )
+}
+
+function isAdminValid(req){
+    if(req.user == null){
+        return false;
+    }
+    
+    if(req.user.type != "admin"){
+        return false;
+    }
+    return true;
 }
