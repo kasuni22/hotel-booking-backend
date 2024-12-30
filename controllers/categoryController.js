@@ -131,3 +131,29 @@ export function getCategoryByName(req,res){
         
     )
 }
+// get Category By Price
+
+export function getCategoryByPrice(req, res) {
+    const { minPrice, maxPrice } = req.query;
+    
+    let query = {};
+    if (minPrice || maxPrice) {
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    Category.find(query)
+        .then((categories) => {
+            res.json({
+                message: "Categories retrieved successfully",
+                categories: categories
+            });
+        })
+        .catch((err) => {
+            res.status(500).json({
+                message: "Failed to retrieve categories",
+                error: err
+            });
+        });
+}
