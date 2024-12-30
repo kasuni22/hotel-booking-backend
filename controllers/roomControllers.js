@@ -111,3 +111,31 @@ export function getRooms(req,res){
         }
     )
 }
+
+// Update Room
+
+export function updateRoom(req,res){
+
+    if(!isAdminValid(req)){
+        res.status(403).json({
+            message : "Forbidden"
+        })
+        return
+    }
+
+    const roomId = req.params.roomId
+
+    Room.findOneAndUpdate({roomId:roomId},req.body).then(
+        ()=>{
+            res.json({
+                message : "Room updated successfully"
+            })
+        }
+    ).catch(
+        ()=>{
+            res.json({
+                message : "Room update failed"
+            })
+        }
+    )
+}
