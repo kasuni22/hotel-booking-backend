@@ -32,3 +32,29 @@ newRoom.save().then(
 
 }
 
+//delete room
+
+export function deleteRoom(req,res){
+    if(!isAdminValid(req)){
+        res.status(403).json({
+            message : "Forbidden"
+        })
+        return
+    }
+
+    const roomId = req.params.id
+
+    Room.findOneAndDelete({roomId:roomId}).then(
+        ()=>{
+            res.json({
+                message : "Room deleted successfully"
+            })
+        }
+    ).catch(
+        ()=>{
+            res.json({
+                message : "Room deletion failed"
+            })
+        }
+    )
+}
