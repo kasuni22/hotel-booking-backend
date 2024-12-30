@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import categoryRouter from "../routes/categoryRoute";
+import categoryRouter from "../routes/categoryRoute.js";
 
 const roomSchema = new mongoose.Schema({
     roomId : {

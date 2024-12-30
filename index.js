@@ -6,6 +6,7 @@ import galleryItemRouter from './routes/galleryItemRoute.js'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import categoryRouter from './routes/categoryRoute.js'
+import roomRouter from './routes/roomRoute.js'
 dotenv.config()
 
 
@@ -48,6 +49,7 @@ mongoose.connect(connectionString).then(
 app.use("/api/users",userRouter)
 app.use("/api/gallery",galleryItemRouter)
 app.use("/api/category",categoryRouter)
+app.use("/api/rooms", roomRouter)
 
 
 

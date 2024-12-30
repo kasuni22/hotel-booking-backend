@@ -1,4 +1,4 @@
-import Room from '../models/roomModel.js';
+import Room from '../models/room.js';
 import {isAdminValid} from './userControllers.js';
 
 //create room
@@ -135,6 +135,25 @@ export function updateRoom(req,res){
         ()=>{
             res.json({
                 message : "Room update failed"
+            })
+        }
+    )
+}
+
+export function getRoomByCategory(req,res){
+    
+    const category = req.params.category
+
+    Room.find({category:category}).then(
+        (result)=>{
+            res.json({
+                rooms : result
+            })
+        }
+    ).catch(
+        ()=>{
+            res.json({
+                message : "Failed to get rooms"
             })
         }
     )
