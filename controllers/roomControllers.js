@@ -3,33 +3,29 @@ import {isAdminValid} from './userControllers.js';
 
 //create room
 
-export function createRoom( req, res){
-
-if(!isAdminValid(req)){
-    res.status(403).json({
-        message : "Forbidden"
-    })
-    return
-}
-
-const newRoom = newRoom(req.body)
-
-newRoom.save().then(
-    (result)=>{
-        res.json({
-            message : "Room created successfully"
-        })
+export function createRoom(req, res) {
+    if (!isAdminValid(req)) {
+        res.status(403).json({
+            message: "Forbidden"
+        });
+        return;
     }
-).catch(
-    (err)=>{
-        res.json({
-            message : "Room creation failed",
-            error : err
-            
-        })
-    }
-)
 
+    const room = new Room(req.body);
+
+    room.save()
+        .then((result) => {
+            res.json({
+                message: "Room created successfully",
+                result: result
+            });
+        })
+        .catch((err) => {
+            res.json({
+                message: "Room creation failed",
+                error: err
+            });
+        });
 }
 
 //delete room

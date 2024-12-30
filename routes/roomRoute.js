@@ -4,7 +4,7 @@ import { createRoom, deleteRoom, findRoomById, getRoomByCategory, getRooms, upda
 const roomRouter = express.Router()
 
 roomRouter.post("/", createRoom)
-roomRouter.delete("/:roomId", deleteRoom)
+roomRouter.delete("/:id", deleteRoom)
 roomRouter.get("/", getRooms)
 roomRouter.get("/by-category/:category", getRoomByCategory)
 roomRouter.get("/:roomId", findRoomById)
