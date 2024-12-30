@@ -1,5 +1,7 @@
 import Category from "../models/category.js";
 
+//create Category
+
 export function createCategory(req,res){
     
 
@@ -73,4 +75,59 @@ export function deleteCategory(req,res){
         }
     )
 
+}
+//get Category
+
+export function getCategory(req,res){
+    
+    Category.find().then(
+        (result)=>{
+            res.json(
+                {
+                    categories : result
+                }
+            )
+        }
+    ).catch(
+        ()=>{
+            res.json(
+                {
+                    message : " failed to get categories"
+                }
+            ) 
+        }
+    )
+
+}
+
+export function getCategoryByName(req,res){
+    const name = req.params.name;
+    Category.findOne({name:name}).then(
+        (result)=>{
+            if(result == null){
+            res.json(
+                {
+                    message : "Category not found"
+                }
+            )
+        }else{
+    
+            res.json(
+                {
+                    category : result
+                }
+            ) 
+        }
+    }
+    ).catch(
+        ()=>{
+            res.json(
+                {
+                    message : " Failed to get category"
+                }
+            )
+
+        }
+        
+    )
 }
