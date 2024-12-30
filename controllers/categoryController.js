@@ -1,4 +1,5 @@
 import Category from "../models/category.js";
+import {isAdminValid} from "./userControllers.js";
 
 //create Category
 
@@ -186,13 +187,3 @@ export function updateCategory(req, res) {
     )
 }
 
-function isAdminValid(req){
-    if(req.user == null){
-        return false;
-    }
-    
-    if(req.user.type != "admin"){
-        return false;
-    }
-    return true;
-}
