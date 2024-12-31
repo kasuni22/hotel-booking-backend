@@ -49,6 +49,14 @@ export function loginUser(req,res){
         message: "Email and password are required"
     });
 }
+
+// Email format validation
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(email)) {
+    return res.status(400).json({
+        message: "Invalid email format"
+    });
+}
     
 User.findOne({ email: email })
 .then((user) => {
@@ -56,9 +64,8 @@ User.findOne({ email: email })
         return res.status(404).json({
             message: "User not found"
         });
-    }
+    } else{
 
-    // Check if user is disabled
     if (user.disabled) {
         return res.status(403).json({
             message: "Your account has been disabled. Please contact support."
@@ -70,10 +77,8 @@ User.findOne({ email: email })
         return res.status(401).json({
             message: "Incorrect password"
         });
-    }
-
-    // Create token payload
-    const payload = {
+    } else{
+        const payload = {
         id: user._id,
         email: user.email,
         firstName: user.firstName,
@@ -103,7 +108,10 @@ User.findOne({ email: email })
         },
         token: token
     });
-})
+   }
+  }
+ }
+)
 .catch((error) => {
     res.status(500).json({
         message: "Login failed",
