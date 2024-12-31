@@ -8,27 +8,36 @@ export function postUsers(req,res){
     const user = req.body;
     const password = req.body.password; 
 
+    if (!password || !user.email || !user.firstName || !user.lastName || !user.whatsApp || !user.phone) {
+      return res.status(400).json({
+          message: "All fields are required"
+      });
+  }
+
     const saltRounds = 10;
     const passwordHash = bcrypt.hashSync(password, saltRounds); 
-
-    console.log(passwordHash);
-
+    
     user.password = passwordHash;
 
     const newUser = new User(user);
     newUser.save().then(
         ()=>{  
-            res.json({
+            res.status(201).json({
                 message : "User created successfully"
             })
         }
-    ).catch(
-        ()=>{
-            res.json({
-                message : "User creation failed"
-            })
-        }  
-    )  
+    ).catch((error) => {
+      if (error.code === 11000) { // Duplicate key error
+          res.status(400).json({
+              message: "Email already exists"
+          });
+        } else {
+          res.status(500).json({
+              message: "User creation failed",
+              error: error.message
+          });
+      }
+  });
 }
 
 export function loginUser(req,res){
