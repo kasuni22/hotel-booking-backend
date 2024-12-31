@@ -27,7 +27,7 @@ export function postUsers(req,res){
             })
         }
     ).catch((error) => {
-      if (error.code === 11000) { // Duplicate key error
+      if (error.code === 11000) { 
           res.status(400).json({
               message: "Email already exists"
           });
@@ -42,46 +42,75 @@ export function postUsers(req,res){
 
 export function loginUser(req,res){
 
+  const { email, password } = req.body;
 
-    const credentials = req.body
-    User.findOne({email : credentials.email}).then(
-      (user)=>{
-
-        if(user == null){
-
-          res.status(403).json({
-            message : "User not found"
-          })
-        }else {
-          const isPasswordValid = bcrypt.compareSync(credentials.password,user.password);
-
-          if (!isPasswordValid){
-            res.status(403).json({
-              message : 'Incorrect password',
-            })
-          }else{
-            const payload = {
-              id: user._id,
-              email: user.email,
-              firstName : user.firstName,
-              lastName : user.lastName,
-              type: user.type,
-            };
-            
-            const token = jwt.sign(payload,process.env.JWT_KEY,{
-            expiresIn: '48h'});
-          
-          res.json({
-            message : "User found",
-            user : user,
-            token: token,
-          });
-
-        }
-      }
-      }
-    )
+  if (!email || !password) {
+    return res.status(400).json({
+        message: "Email and password are required"
+    });
+}
+    
+User.findOne({ email: email })
+.then((user) => {
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found"
+        });
     }
+
+    // Check if user is disabled
+    if (user.disabled) {
+        return res.status(403).json({
+            message: "Your account has been disabled. Please contact support."
+        });
+    }
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+    if (!isPasswordValid) {
+        return res.status(401).json({
+            message: "Incorrect password"
+        });
+    }
+
+    // Create token payload
+    const payload = {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        type: user.type,
+    };
+
+    // Sign token
+    const token = jwt.sign(
+        payload, 
+        process.env.JWT_KEY,
+        { expiresIn: '48h' }
+    );
+
+    // Send response
+    res.status(200).json({
+        message: "Login successful",
+        user: {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            type: user.type,
+            whatsApp: user.whatsApp,
+            phone: user.phone,
+            emailVerified: user.emailVerified
+        },
+        token: token
+    });
+})
+.catch((error) => {
+    res.status(500).json({
+        message: "Login failed",
+        error: error.message
+    });
+});
+}
 
     export function isAdminValid(req){
       if(req.user == null){
