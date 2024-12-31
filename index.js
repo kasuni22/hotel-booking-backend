@@ -8,6 +8,7 @@ import dotenv from 'dotenv'
 import categoryRouter from './routes/categoryRoute.js'
 import roomRouter from './routes/roomRoute.js'
 import bookingRouter from './routes/bookingRoute.js'
+import { notFound, errorHandler } from './errorMiddleware.js'   
 dotenv.config()
 
 
@@ -53,7 +54,9 @@ app.use("/api/category",categoryRouter)
 app.use("/api/rooms", roomRouter)
 app.use("/api/bookings", bookingRouter)
 
-
+// Error Handling Middlewares
+app.use(notFound)
+app.use(errorHandler)
 
 
 app.listen(5000,(req,res)=>{

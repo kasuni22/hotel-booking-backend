@@ -3,134 +3,90 @@ import {isAdminValid} from "./userControllers.js";
 
 //create Category
 
-export function createCategory(req,res){
-    
-
-    if(req.user == null){
-        res.status(401).json({
-            message : "Unauthorized"
-        })
-        return
-    }
-    
-    if(req.user.type != "admin"){
-        res.status(403).json({
-            message : " Forbidden"
-        })
-        return
-    }
-
-    const newCategory = new Category(req.body)
-    
-    newCategory.save().then(
-        (result)=>{
-
-            res.json({
-                message: "Category created successfully",
-                result: result
-            })
-        }
-    ).catch(
-        (err)=>{
-            res.json({
-                message: "Category creation failed",
-                error: err
-            })
-        }
-    )
-}
-
-//delete category
-
-export function deleteCategory(req,res){
-    
-    if(req.user == null){
-        res.status(401).json({
-            message : "Unauthorized"
-        })
-        return
-    }
-    
-    if(req.user.type != "admin"){
-        res.status(403).json({
-            message : " Forbidden"
-        })
-        return
-    }
-    const name = req.params.name
-    Category.findOneAndDelete({name:name}).then(
-        ()=>{
-            res.json(
-                {
-                    message : "Category deleted successfully"
-                }
-            )
-        }
-    ).catch(
-        ()=>{
-            res.json(
-                {
-                    message : "Category deletion failed "
-                }
-            ) 
-        }
-    )
-
-}
-//get Category
-
-export function getCategory(req,res){
-    
-    Category.find().then(
-        (result)=>{
-            res.json(
-                {
-                    categories : result
-                }
-            )
-        }
-    ).catch(
-        ()=>{
-            res.json(
-                {
-                    message : " failed to get categories"
-                }
-            ) 
-        }
-    )
-
-}
-
-export function getCategoryByName(req,res){
-    const name = req.params.name;
-    Category.findOne({name:name}).then(
-        (result)=>{
-            if(result == null){
-            res.json(
-                {
-                    message : "Category not found"
-                }
-            )
-        }else{
-    
-            res.json(
-                {
-                    category : result
-                }
-            ) 
-        }
-    }
-    ).catch(
-        ()=>{
-            res.json(
-                {
-                    message : " Failed to get category"
-                }
-            )
-
+export async function createCategory(req, res, next) {
+    try {
+        if(req.user == null){
+            res.status(401);
+            throw new Error("Unauthorized");
         }
         
-    )
+        if(req.user.type != "admin"){
+            res.status(403);
+            throw new Error("Forbidden");
+        }
+
+        const newCategory = new Category(req.body);
+        await newCategory.save();
+        
+        res.json({
+            message: "Category created successfully",
+            result: newCategory
+        });
+    } catch (error) {
+        if (error.code === 11000) {
+            res.status(400);
+            next(new Error("Category name must be unique"));
+        } else {
+            next(error);
+        }
+    }
+}
+
+export async function deleteCategory(req, res, next) {
+    try {
+        if(req.user == null){
+            res.status(401);
+            throw new Error("Unauthorized");
+        }
+        
+        if(req.user.type != "admin"){
+            res.status(403);
+            throw new Error("Forbidden");
+        }
+
+        const name = req.params.name;
+        const result = await Category.findOneAndDelete({name: name});
+        
+        if (!result) {
+            res.status(404);
+            throw new Error("Category not found");
+        }
+
+        res.json({
+            message: "Category deleted successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getCategory(req, res, next) {
+    try {
+        const categories = await Category.find();
+        res.json({
+            categories: categories
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getCategoryByName(req, res, next) {
+    try {
+        const name = req.params.name;
+        const category = await Category.findOne({name: name});
+        
+        if (!category) {
+            res.status(404);
+            throw new Error("Category not found");
+        }
+
+        res.json({
+            category: category
+        });
+    } catch (error) {
+        next(error);
+    }
 }
 // get Category By Price
 

@@ -10,6 +10,11 @@ export function createBooking(req, res){
         return
     }
 
+    const { roomId, email, start, end } = req.body;
+        if (!roomId || !email || !start || !end) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
     const startingId = 1200;
 
     Booking.countDocuments({}).then(

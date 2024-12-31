@@ -13,7 +13,8 @@ const bookingSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        match: [/.+@.+\..+/, "Invalid email format"]
     },
     status: {
         type: String,

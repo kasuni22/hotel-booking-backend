@@ -5,7 +5,8 @@ const userSchema = mongoose.Schema(
         email : {
             type : String,
             required : true,
-            unique : true
+            unique : true,
+            match: [/.+@.+\..+/, "Invalid email format"]
 
         },
 
@@ -29,12 +30,14 @@ const userSchema = mongoose.Schema(
         },
         whatsApp : {
             type : String,
-            required : true
+            required : true,
+            match: [/^\d{10,15}$/, "Invalid phone number"]
         },
         
         phone : {
             type : String,
-            required : true
+            required : true,
+            match: [/^\d{10,15}$/, "Invalid phone number"]
         },
         disabled : {
             type : Boolean,
@@ -46,8 +49,9 @@ const userSchema = mongoose.Schema(
             required : true,
             default : false
         }
-    }
-)
+    },
+    { timestamps: true }
+);
 
 const User = mongoose.model("Users", userSchema)
 
