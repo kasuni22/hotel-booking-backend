@@ -103,3 +103,66 @@ export function deleteBooking(req, res) {
             });
         });
 }
+
+//update Booking Status
+
+export function updateBookingStatus(req, res) {
+    
+    if (!isAdminValid(req)) {
+        res.status(403).json({
+            message: "Forbidden - Admin access required"
+        });
+        return;
+    }
+
+    const { bookingId } = req.params;
+    const { status, reason } = req.body;
+
+    
+    if (!bookingId || !status) {
+        return res.status(400).json({
+            message: "Booking ID and status are required"
+        });
+    }
+
+    
+    const validStatuses = ["pending", "approved", "rejected", "cancelled", "completed"];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+            message: "Invalid status value",
+            validStatuses: validStatuses
+        });
+    }
+
+    Booking.findOne({ bookingId: bookingId })
+        .then(booking => {
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found"
+                });
+            }
+
+            
+            return Booking.findOneAndUpdate(
+                { bookingId: bookingId },
+                { 
+                    status: status,
+                    reason: reason || "",
+                    timeStamp: Date.now() 
+                },
+                { new: true } 
+            );
+        })
+        .then(updatedBooking => {
+            res.json({
+                message: "Booking status updated successfully",
+                booking: updatedBooking
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "Failed to update booking status",
+                error: err
+            });
+        });
+}
