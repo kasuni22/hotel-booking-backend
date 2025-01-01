@@ -248,3 +248,60 @@ export function updateBookingDetails(req, res) {
             });
         });
 }
+
+//update Booking Notes
+
+export function updateBookingNotes(req, res) {
+    
+    if (!isAdminValid(req)) {
+        res.status(403).json({
+            message: "Forbidden - Admin access required"
+        });
+        return;
+    }
+
+    const { bookingId } = req.params;
+    const { notes } = req.body;
+
+    if (!bookingId) {
+        return res.status(400).json({
+            message: "Booking ID is required"
+        });
+    }
+
+    if (!notes && notes !== "") {
+        return res.status(400).json({
+            message: "Notes field is required"
+        });
+    }
+
+    Booking.findOne({ bookingId: bookingId })
+        .then(booking => {
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found"
+                });
+            }
+
+            return Booking.findOneAndUpdate(
+                { bookingId: bookingId },
+                { 
+                    notes: notes,
+                    timeStamp: Date.now()
+                },
+                { new: true }
+            );
+        })
+        .then(updatedBooking => {
+            res.json({
+                message: "Booking notes updated successfully",
+                booking: updatedBooking
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "Failed to update booking notes",
+                error: err
+            });
+        });
+}
