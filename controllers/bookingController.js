@@ -166,3 +166,85 @@ export function updateBookingStatus(req, res) {
             });
         });
 }
+
+//update Booking Details
+
+export function updateBookingDetails(req, res) {
+   
+    if (!isAdminValid(req)) {
+        res.status(403).json({
+            message: "Forbidden - Admin access required"
+        });
+        return;
+    }
+
+    const { bookingId } = req.params;
+    const { roomId, email, start, end, notes } = req.body;
+
+    if (!bookingId) {
+        return res.status(400).json({
+            message: "Booking ID is required"
+        });
+    }
+
+    
+    const updateData = {};
+    if (roomId) updateData.roomId = roomId;
+    if (email) updateData.email = email;
+    if (start) updateData.start = start;
+    if (end) updateData.end = end;
+    if (notes !== undefined) updateData.notes = notes;
+    updateData.timeStamp = Date.now();
+
+    
+    if (Object.keys(updateData).length === 1) { 
+        return res.status(400).json({
+            message: "No valid fields provided for update"
+        });
+    }
+
+    Booking.findOne({ bookingId: bookingId })
+        .then(booking => {
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found"
+                });
+            }
+
+            
+            if (email && !/.+@.+\..+/.test(email)) {
+                return res.status(400).json({
+                    message: "Invalid email format"
+                });
+            }
+
+            
+            if (start && end) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                if (startDate >= endDate) {
+                    return res.status(400).json({
+                        message: "End date must be after start date"
+                    });
+                }
+            }
+
+            return Booking.findOneAndUpdate(
+                { bookingId: bookingId },
+                updateData,
+                { new: true }
+            );
+        })
+        .then(updatedBooking => {
+            res.json({
+                message: "Booking updated successfully",
+                booking: updatedBooking
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "Failed to update booking",
+                error: err
+            });
+        });
+}
