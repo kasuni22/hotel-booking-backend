@@ -1,5 +1,5 @@
 import express from 'express';  
-import { createBooking, deleteBooking, updateBookingDetails, updateBookingNotes, updateBookingStatus } from '../controllers/bookingController.js';
+import { createBooking, deleteBooking, getBookings, updateBookingDetails, updateBookingNotes, updateBookingStatus } from '../controllers/bookingController.js';
 
 const bookingRouter = express.Router();
 
@@ -12,5 +12,7 @@ bookingRouter.patch("/:bookingId/status", updateBookingStatus);
 bookingRouter.put("/:bookingId", updateBookingDetails);
 
 bookingRouter.patch("/:bookingId/notes", updateBookingNotes);
+
+bookingRouter.get("/", getBookings);
 
 export default bookingRouter;
