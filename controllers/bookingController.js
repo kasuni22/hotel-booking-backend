@@ -309,25 +309,25 @@ export function updateBookingNotes(req, res) {
 //get Bookings
 
 export function getBookings(req, res) {
-    // First check if it's an admin
+    
     const isAdmin = isAdminValid(req);
     const isCustomer = isCustomerValid(req);
 
-    // If neither admin nor customer, return forbidden
+    
     if (!isAdmin && !isCustomer) {
         return res.status(403).json({
             message: "Forbidden - Authentication required"
         });
     }
 
-    // Get query parameters for filtering and pagination
+    
     const { page = 1, limit = 10, status, startDate, endDate } = req.query;
     const skip = (page - 1) * limit;
 
-    // Build query object
+    
     let query = {};
 
-    // If customer, only show their bookings
+    
     if (!isAdmin) {
         const customerEmail = req.body.email || req.query.email;
         if (!customerEmail) {
@@ -338,7 +338,7 @@ export function getBookings(req, res) {
         query.email = customerEmail;
     }
 
-    // Add optional filters
+    
     if (status) {
         query.status = status;
     }
@@ -348,12 +348,12 @@ export function getBookings(req, res) {
         if (endDate) query.start.$lte = new Date(endDate);
     }
 
-    // Get total count for pagination
+    
     Booking.countDocuments(query)
         .then(totalCount => {
-            // Get bookings with pagination
+            
             return Booking.find(query)
-                .sort({ timeStamp: -1 }) // Sort by timestamp, newest first
+                .sort({ timeStamp: -1 }) 
                 .skip(skip)
                 .limit(parseInt(limit))
                 .then(bookings => {
