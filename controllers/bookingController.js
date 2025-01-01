@@ -376,3 +376,44 @@ export function getBookings(req, res) {
             });
         });
 }
+
+// Function to get a single booking by ID
+
+export function getBookingById(req, res) {
+    const { bookingId } = req.params;
+    const isAdmin = isAdminValid(req);
+    const isCustomer = isCustomerValid(req);
+
+    if (!isAdmin && !isCustomer) {
+        return res.status(403).json({
+            message: "Forbidden - Authentication required"
+        });
+    }
+
+    Booking.findOne({ bookingId: bookingId })
+        .then(booking => {
+            if (!booking) {
+                return res.status(404).json({
+                    message: "Booking not found"
+                });
+            }
+
+            
+            if (!isAdmin && booking.email !== req.body.email) {
+                return res.status(403).json({
+                    message: "Forbidden - You can only view your own bookings"
+                });
+            }
+
+            res.json({
+                message: "Booking retrieved successfully",
+                booking: booking
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "Failed to retrieve booking",
+                error: err
+            });
+        });
+}
