@@ -8,11 +8,14 @@ import dotenv from 'dotenv'
 import categoryRouter from './routes/categoryRoute.js'
 import roomRouter from './routes/roomRoute.js'
 import bookingRouter from './routes/bookingRoute.js'
+import cors from 'cors'
 import { notFound, errorHandler } from './errorMiddleware.js'   
 dotenv.config()
 
 
 const app = express() 
+
+app.use(cors())
 
 app.use(bodyParser.json())
 
