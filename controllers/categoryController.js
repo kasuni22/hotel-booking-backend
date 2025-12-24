@@ -5,15 +5,15 @@ import {isAdminValid} from "./userControllers.js";
 
 export async function createCategory(req, res, next) {
     try {
-        if(req.user == null){
-            res.status(401);
-            throw new Error("Unauthorized");
-        }
+        // if(req.user == null){
+        //     res.status(401);
+        //     throw new Error("Unauthorized");
+        // }
         
-        if(req.user.type != "admin"){
-            res.status(403);
-            throw new Error("Forbidden");
-        }
+        // if(req.user.type != "admin"){
+        //     res.status(403);
+        //     throw new Error("Forbidden");
+        // }
 
         const newCategory = new Category(req.body);
         await newCategory.save();
@@ -33,32 +33,21 @@ export async function createCategory(req, res, next) {
 }
 
 export async function deleteCategory(req, res, next) {
-    try {
-        if(req.user == null){
-            res.status(401);
-            throw new Error("Unauthorized");
-        }
-        
-        if(req.user.type != "admin"){
-            res.status(403);
-            throw new Error("Forbidden");
-        }
+  try {
+    const id = req.params.id
 
-        const name = req.params.name;
-        const result = await Category.findOneAndDelete({name: name});
-        
-        if (!result) {
-            res.status(404);
-            throw new Error("Category not found");
-        }
+    const result = await Category.findByIdAndDelete(id)
 
-        res.json({
-            message: "Category deleted successfully"
-        });
-    } catch (error) {
-        next(error);
+    if (!result) {
+      return res.status(404).json({ message: "Category not found" })
     }
+
+    res.json({ message: "Category deleted successfully" })
+  } catch (error) {
+    next(error)
+  }
 }
+
 
 export async function getCategory(req, res, next) {
     try {
@@ -71,23 +60,20 @@ export async function getCategory(req, res, next) {
     }
 }
 
-export async function getCategoryByName(req, res, next) {
-    try {
-        const name = req.params.name;
-        const category = await Category.findOne({name: name});
-        
-        if (!category) {
-            res.status(404);
-            throw new Error("Category not found");
-        }
+export async function getCategoryById(req, res, next) {
+  try {
+    const category = await Category.findById(req.params.id)
 
-        res.json({
-            category: category
-        });
-    } catch (error) {
-        next(error);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" })
     }
+
+    res.json({ category })
+  } catch (error) {
+    next(error)
+  }
 }
+
 // get Category By Price
 
 export function getCategoryByPrice(req, res) {
@@ -117,29 +103,16 @@ export function getCategoryByPrice(req, res) {
 
 // update Category
 
-export function updateCategory(req, res) {
+export async function updateCategory(req, res) {
+  const id = req.params.id
 
-    if(!isAdminValid(req)) {
-        res.status(403).json({
-            message: "Unauthorized"
-        })
-        return
-    }
-    
-    const name = req.params.name;
-
-    Category.updateOne({ name: name },req.body).then(
-        () => {
-        res.json({
-            message: "Category updated successfully"
-        })
-    }).catch(
-        () => {
-        res.json({
-            message: "Failed to update category"
-            
-        })
-    }
-    )
+  Category.findByIdAndUpdate(id, req.body)
+    .then(() => {
+      res.json({ message: "Category updated successfully" })
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Failed to update category" })
+    })
 }
+
 
