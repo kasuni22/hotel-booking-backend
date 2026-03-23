@@ -5,10 +5,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function postUsers(req,res){
-    const user = req.body;
-    const password = req.body.password; 
+    const { email, firstName, lastName, whatsApp, phone, password } = req.body;
 
-    if (!password || !user.email || !user.firstName || !user.lastName || !user.whatsApp || !user.phone) {
+    if (!password || !email || !firstName || !lastName || !whatsApp || !phone) {
       return res.status(400).json({
           message: "All fields are required"
       });
@@ -17,9 +16,17 @@ export function postUsers(req,res){
     const saltRounds = 10;
     const passwordHash = bcrypt.hashSync(password, saltRounds); 
     
-    user.password = passwordHash;
+    const safeUser = {
+        email,
+        firstName,
+        lastName,
+        whatsApp,
+        phone,
+        password: passwordHash,
+        type: "customer"
+    };
 
-    const newUser = new User(user);
+    const newUser = new User(safeUser);
     newUser.save().then(
         ()=>{  
             res.status(201).json({

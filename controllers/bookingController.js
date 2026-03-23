@@ -39,7 +39,7 @@ export function createBooking(req, res){
                 (error)=>{
                     res.json({
                         message : "Booking creation failed",
-                        error : err
+                        error : error
                     })
                 }
             )
@@ -79,26 +79,31 @@ export function deleteBooking(req, res) {
                 });
             }
 
-            
-            if (booking.email !== req.body.email) {
+            if (booking.email !== req.user.email) {
                 return res.status(403).json({
                     message: "You can only delete your own bookings"
                 });
             }
 
-            return Booking.deleteOne({ bookingId: bookingId });
-        })
-        .then(result => {
-            if (result && result.deletedCount > 0) {
-                res.json({
-                    message: "Booking deleted successfully",
-                    result: result
+            Booking.deleteOne({ bookingId: bookingId })
+                .then(result => {
+                    if (result && result.deletedCount > 0) {
+                        res.json({
+                            message: "Booking deleted successfully",
+                            result: result
+                        });
+                    }
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        message: "Failed to delete booking",
+                        error: err
+                    });
                 });
-            }
         })
         .catch(err => {
             res.status(500).json({
-                message: "Failed to delete booking",
+                message: "Failed to process booking deletion",
                 error: err
             });
         });
@@ -329,7 +334,7 @@ export function getBookings(req, res) {
 
     
     if (!isAdmin) {
-        const customerEmail = req.body.email || req.query.email;
+        const customerEmail = req.user.email;
         if (!customerEmail) {
             return res.status(400).json({
                 message: "Email is required for customer bookings"
@@ -399,7 +404,7 @@ export function getBookingById(req, res) {
             }
 
             
-            if (!isAdmin && booking.email !== req.body.email) {
+            if (!isAdmin && booking.email !== req.user.email) {
                 return res.status(403).json({
                     message: "Forbidden - You can only view your own bookings"
                 });
