@@ -5,15 +5,9 @@ import {isAdminValid} from "./userControllers.js";
 
 export async function createCategory(req, res, next) {
     try {
-        // if(req.user == null){
-        //     res.status(401);
-        //     throw new Error("Unauthorized");
-        // }
-        
-        // if(req.user.type != "admin"){
-        //     res.status(403);
-        //     throw new Error("Forbidden");
-        // }
+        if (!isAdminValid(req)) {
+            return res.status(403).json({ message: "Forbidden" });
+        }
 
         const newCategory = new Category(req.body);
         await newCategory.save();
@@ -34,6 +28,10 @@ export async function createCategory(req, res, next) {
 
 export async function deleteCategory(req, res, next) {
   try {
+    if (!isAdminValid(req)) {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+
     const id = req.params.id
 
     const result = await Category.findByIdAndDelete(id)
@@ -104,6 +102,10 @@ export function getCategoryByPrice(req, res) {
 // update Category
 
 export async function updateCategory(req, res) {
+  if (!isAdminValid(req)) {
+      return res.status(403).json({ message: "Forbidden" });
+  }
+
   const id = req.params.id
 
   Category.findByIdAndUpdate(id, req.body)

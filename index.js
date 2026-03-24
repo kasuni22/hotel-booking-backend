@@ -9,11 +9,11 @@ import categoryRouter from './routes/categoryRoute.js'
 import roomRouter from './routes/roomRoute.js'
 import bookingRouter from './routes/bookingRoute.js'
 import cors from 'cors'
-import { notFound, errorHandler } from './errorMiddleware.js'   
+import { notFound, errorHandler } from './errorMiddleware.js'
 dotenv.config()
 
 
-const app = express() 
+const app = express()
 
 app.use(cors())
 
@@ -21,41 +21,42 @@ app.use(bodyParser.json())
 
 const connectionString = process.env.MONGO_URL
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
 
     const token = req.header("Authorization")?.replace("Bearer ", "")
 
-    console.log("***"+token+"***")
+    console.log("***" + token + "***")
 
 
-    if(token != null){
-        jwt.verify(token,process.env.JWT_KEY,
-            (err,decoded)=>{
-                if(decoded != null){
-                    req.body.user = decoded
+    if (token != null) {
+        jwt.verify(token, process.env.JWT_KEY,
+            (err, decoded) => {
+                if (decoded != null) {
+                    req.user = decoded
                     next()
-                }else{
+                } else {
                     next()
                 }
             }
 
         )
-    }else{
+    } else {
         next()
+
     }
 });
 mongoose.connect(connectionString).then(
-    ()=>{
+    () => {
         console.log("Connected to the database")
     }
 ).catch(
-    ()=>{
-        console.log("Connection failed")
+    (err) => {
+        console.error("Connection failed! Detailed database error:", err.message)
     }
 )
-app.use("/api/users",userRouter)
-app.use("/api/gallery",galleryItemRouter)
-app.use("/api/category",categoryRouter)
+app.use("/api/users", userRouter)
+app.use("/api/gallery", galleryItemRouter)
+app.use("/api/category", categoryRouter)
 app.use("/api/rooms", roomRouter)
 app.use("/api/bookings", bookingRouter)
 
@@ -64,6 +65,6 @@ app.use(notFound)
 app.use(errorHandler)
 
 
-app.listen(5000,(req,res)=>{
+app.listen(5000, (req, res) => {
     console.log("Server is running on on port 5000 ")
 });

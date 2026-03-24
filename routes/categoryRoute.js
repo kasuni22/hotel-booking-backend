@@ -6,12 +6,11 @@ const categoryRouter = express.Router();
 categoryRouter.post("/", createCategory)
 
 categoryRouter.get("/", getCategory)
+categoryRouter.get("/searchByPrice", getCategoryByPrice)
 categoryRouter.get("/:id", getCategoryById)
 
 categoryRouter.put("/:id", updateCategory)
 categoryRouter.delete("/:id", deleteCategory)
-
-categoryRouter.get("/searchByPrice", getCategoryByPrice)
 
 
 

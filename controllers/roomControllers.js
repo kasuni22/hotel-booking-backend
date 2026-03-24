@@ -64,7 +64,7 @@ export function findRoomById(req,res){
     Room.findOne({roomId:roomId}).then(
         (room)=>{
 
-            if(result == null){
+            if(room == null){
                 res.status(404).json({
                     message : "Room not found"
                 })
@@ -73,7 +73,7 @@ export function findRoomById(req,res){
                 res.json(
                     {
                         message : "Room found",
-                        result : result
+                        result : room
                     }
                 )
             }
