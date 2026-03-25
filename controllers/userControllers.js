@@ -150,18 +150,27 @@ User.findOne({ email: email })
   }
 
   export function getUser(req,res){
-    const user = req.body.user;
-
-    if(user == null){
-        res.json({
-            message: "not found"
-        });
-    }else{
-        res.json({
-            message: "found",
-            user: user
+    if(!isAdminValid(req)){
+        return res.status(403).json({
+            message: "Forbidden - Admin access required"
         });
     }
+
+    User.find().then(
+        (users)=>{
+            res.json({
+                message: "Users retrieved successfully",
+                users: users
+            });
+        }
+    ).catch(
+        (error)=>{
+            res.status(500).json({
+                message: "Failed to retrieve users",
+                error: error.message
+            });
+        }
+    );
   }
 
   
