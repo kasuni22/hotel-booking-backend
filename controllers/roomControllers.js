@@ -21,9 +21,9 @@ export function createRoom(req, res) {
             });
         })
         .catch((err) => {
-            res.json({
+            res.status(400).json({
                 message: "Room creation failed",
-                error: err
+                error: err.message
             });
         });
 }

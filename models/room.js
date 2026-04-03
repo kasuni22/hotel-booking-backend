@@ -24,10 +24,9 @@ const roomSchema = new mongoose.Schema({
         required : true,
         default : true
     },
-    photos : {
-        type : String
-        
-    },
+    photos: [{ 
+        type: String 
+    }],
     specialDescription : {
         type : String,
         default : ""
