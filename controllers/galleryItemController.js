@@ -1,20 +1,12 @@
 import GalleryItem from "../models/galleryItem.js"
+import { isAdminValid } from "./userControllers.js"
 
 
 export function createGalleryItem(req,res){
 
-    const user = req.user
-
-    if(user == null){
+    if (!isAdminValid(req)) {
         res.status(403).json({
-            message : "Please login to create a gallery item"
-        })
-        return
-    }
-    
-    if(user.type != "admin"){
-        res.status(403).json({
-            message : "You are not authorized to create a gallery item"
+            message : "Forbidden"
         })
         return
     }
