@@ -11,9 +11,8 @@ export function createGalleryItem(req,res){
         return
     }
     
-    const galleryItem = req.body.item
-
-    const newGalleryItem = new GalleryItem(galleryItem)
+    const { name, image, description } = req.body
+    const newGalleryItem = new GalleryItem({ name, image, description })
     newGalleryItem.save().then(
         ()=>{
             res.json({
