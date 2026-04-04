@@ -1,5 +1,5 @@
 import Booking from "../models/booking.js";
-import { isCustomerValid } from "./userControllers.js";
+import { isCustomerValid, isAdminValid } from "./userControllers.js";
 
 export function createBooking(req, res){
 
@@ -327,14 +327,14 @@ export function getBookings(req, res) {
 
     
     const { page = 1, limit = 10, status, startDate, endDate } = req.query;
-    const skip = (page - 1) * limit;
+    const skip = (Math.max(1, parseInt(page)) - 1) * limit;
 
     
     let query = {};
 
     
     if (!isAdmin) {
-        const customerEmail = req.user.email;
+        const customerEmail = req.user?.email;
         if (!customerEmail) {
             return res.status(400).json({
                 message: "Email is required for customer bookings"
